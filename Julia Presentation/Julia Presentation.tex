@@ -1,0 +1,463 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+
+% Define Julia language for listings
+\lstdefinelanguage{Julia}{
+  morekeywords={
+    function, end, if, else, elseif, while, for, in, return, break, continue,
+    local, global, const, let, do, struct, mutable, import, using, where,
+    println, begin, try, catch
+  },
+  sensitive=true,
+  morecomment=[l]\#,
+  morestring=[b]",
+}
+
+\lstset{
+  language=Julia,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{gray}\em,
+  stringstyle=\color{red},
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  breaklines=true,
+  frame=single,
+  tabsize=2,
+  columns=fullflexible
+}
+
+\title[Julia for Data Science]{Julia: Bridging the Gap in Technical Computing for Data Science \& Beyond}
+\author[Nick Uhorchak]{Nick Uhorchak \ University of Arkansas}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+    \tableofcontents
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}{The Language Problem}
+    \begin{itemize}
+        \item \textbf{A familiar pain point:} But C++ is faster than ... \textit{(R, Python...)}.
+        \item When performance is critical, often re-implementing in lower-level languages (C++, Fortran).
+        \item This creates a development overhead and potential for bugs.
+        \item Besides, who likes to write code twice!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{What is Julia?}
+    \begin{itemize}
+        \item High-level, high-performance \textbf{dynamic} programming language.
+        \item Designed for numerical and scientific computing.
+        \item \textbf{"Walks like Python, Runs like C."}
+        \item Open-source and free.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Why Julia Now? Key Interests}
+    \begin{itemize}
+        \item \textbf{Performance:} JIT compilation to native machine code (LLVM). Often competitive with C/Fortran.
+        \item \textbf{Solves the "Language Problem":} Write high-performance code directly in Julia.
+        \item \textbf{Mathematical Syntax:} Intuitive for mathematicians and engineers. Similar to python.
+        \item \textbf{Dynamic \& Flexible:} Interactivity of dynamic languages with performance of compiled ones.
+        \item \textbf{Growing Ecosystem:} Rich set of packages for data science, ML, scientific computing.
+        \item \textbf{General Purpose:} Beyond numerical computing, capable of web dev, scripting.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Julia vs Python/R: What Really Matters for Data Science}
+\textbf{What do you want as a data scientist?}
+
+\begin{itemize}
+    \item Fast iteration: load, transform, visualize, model — quickly.
+    \item Simple syntax and interactive experience (like Python or R).
+    \item Seamless scaling: small prototype to big data or production.
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Where Julia Fits:}
+
+\begin{columns}
+    \begin{column}{0.48\textwidth}
+    \textbf{Julia}
+    \scriptsize
+    \begin{itemize}\setlength{\itemsep}{2pt}
+        \item Feels like Python or R in the REPL.
+        \item You get real speed without changing your code. (unless you code poorly anyways!)
+        \item Same package handles exploration \& production.
+        \item DataFrames.jl, CSV.jl, MLJ.jl, Plots.jl — clean and expressive.
+    \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+    \textbf{Python / R}
+    \scriptsize
+    \begin{itemize}\setlength{\itemsep}{2pt}
+        \item Excellent for exploration and prototyping.
+        \item Performance usually depends on compiled extensions (NumPy, data.table).
+        \item Scaling up often means changing tools.
+        \item Language boundaries can complicate deployment.
+    \end{itemize}
+    \end{column}
+\end{columns}
+
+\vspace{0.3cm}
+\textit{Julia offers the simplicity of scripting with the performance of systems code — in a single, consistent toolchain.}
+\end{frame}
+
+\section{Julia Fundamentals: Data Structures}
+
+\begin{frame}[fragile]{Numbers and Arrays: Julia vs Python}
+\begin{itemize}
+    \item \textbf{Numbers:} Native support for various types (Integers, Floats, Complex, Rationals).
+    \item \textbf{Arrays/Matrices:} Core for numerical computing.
+    \item \textbf{One-based indexing:} (Similar to R/MATLAB, different from Python/C++).
+    \item \textbf{Broadcasting (`.`):} Element-wise operations (similar to NumPy).
+\end{itemize}
+
+\vspace{0.3cm}
+\begin{columns}
+    \begin{column}{0.5\textwidth}
+    \textbf{Julia}
+    \begin{lstlisting}
+# Vector
+v = [1, 2, 3, 4, 5]
+
+# Matrix
+M = [1 2; 3 4]
+
+# Array comprehension
+A = [i*j for i in 1:3, j in 1:3]
+    \end{lstlisting}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+    \textbf{Python (NumPy)}
+    \begin{lstlisting}[language=Python]
+import numpy as np
+
+v = np.array([1, 2, 3, 4, 5])
+M = np.array([[1, 2], [3, 4]])
+A = np.array([[i*j for j in range(1, 4)] 
+              for i in range(1, 4)])
+    \end{lstlisting}
+    \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Tuples and Dictionaries: Julia vs Python}
+\begin{itemize}
+    \item \textbf{Tuples:} Immutable, ordered collections.
+    \item \textbf{Dictionaries (Dict):} Key-value pairs.
+\end{itemize}
+
+\vspace{0.3cm}
+\begin{columns}
+    \begin{column}{0.48\textwidth}
+    \textbf{Julia}
+    \begin{lstlisting}
+# Tuple
+t = (1, "hello", 3.14)
+
+# Dictionary
+d = Dict("name" => "Julia",
+         "version" => 1.9)
+    \end{lstlisting}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+    \textbf{Python}
+    \begin{lstlisting}[language=Python]
+# Tuple
+t = (1, "hello", 3.14)
+
+# Dictionary
+d = {"name": "Julia",
+     "version": 1.9}
+    \end{lstlisting}
+    \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Tabular Data: Julia vs Python}
+\begin{itemize}
+    \item Equivalent to R’s \texttt{data.frame} or Python’s Pandas DataFrame.
+    \item Efficient for manipulation, supports missing data.
+\end{itemize}
+
+\vspace{0.3cm}
+\begin{columns}
+    \begin{column}{0.48\textwidth}
+    \textbf{Julia (DataFrames.jl)}
+    \begin{lstlisting}
+using DataFrames
+
+df = DataFrame(Name=["Alice", "Bob"],
+               Age=[25, 30])
+
+select(df, :Name)
+filter(:Age => >(26), df)
+    \end{lstlisting}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+    \textbf{Python (pandas)}
+    \begin{lstlisting}[language=Python]
+import pandas as pd
+
+df = pd.DataFrame({
+    "Name": ["Alice", "Bob"],
+    "Age": [25, 30]
+})
+
+df[["Name"]]
+df[df["Age"] > 26]
+    \end{lstlisting}
+    \end{column}
+\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%
+\begin{frame}[fragile]{Control Flow Syntax: The Role of \texttt{end}}
+
+\textbf{Julia requires explicit \texttt{end} statements} to close control blocks like \texttt{for}, \texttt{if}, and \texttt{function}.
+
+\vspace{0.4cm}
+\begin{columns}[t]
+    \begin{column}{0.33\textwidth}
+    \textbf{Julia}
+\begin{lstlisting}[language=Julia]
+for i in 1:5
+    println(i)
+end
+\end{lstlisting}
+    \end{column}
+
+    \begin{column}{0.33\textwidth}
+    \textbf{Python}
+\begin{lstlisting}[language=Python]
+for i in range(1, 6):
+    print(i)
+\end{lstlisting}
+    \end{column}
+
+    \begin{column}{0.33\textwidth}
+    \textbf{R}
+\begin{lstlisting}[language=R]
+for (i in 1:5) {
+  print(i)
+}
+\end{lstlisting}
+    \end{column}
+\end{columns}
+
+\vspace{0.3cm}
+\begin{itemize}
+    \item Julia uses \texttt{end} to clearly mark block boundaries.
+    \item Python relies on indentation.
+    \item R uses braces \texttt{\{\}} to define scope.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%
+
+
+\section{Intro to Stats/ML/Viz Libraries}
+
+\begin{frame}[fragile]{Statistics Libraries}
+\begin{itemize}
+    \item \texttt{Statistics.jl}, \texttt{StatsBase.jl}, \texttt{Distributions.jl}, \texttt{HypothesisTests.jl}
+\end{itemize}
+\begin{lstlisting}
+using Statistics, Distributions
+
+data = randn(100)
+println("Mean: $(mean(data))")
+println("Std Dev: $(std(data))")
+
+d = Normal(0, 1)
+println("PDF at 0: $(pdf(d, 0.0))")
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Machine Learning with MLJ.jl}
+\begin{itemize}
+    \item \textbf{MLJ.jl:} Unified interface to many ML models.
+    \item Common API for EvoTrees, DecisionTree, Flux, etc.
+\end{itemize}
+\begin{lstlisting}
+using MLJ, EvoTrees, DataFrames
+using MLJBase
+@load EvoTreeClassifier pkg=EvoTrees
+
+X = DataFrame(f1 = rand(100), f2 = rand(100))
+y = categorical(rand(Bool, 100))
+
+train, test = partition(eachindex(y), 0.7, shuffle=true)
+Xtrain, Xtest = X[train,:], X[test,:]
+ytrain, ytest = y[train], y[test]
+
+model = EvoTreesClassifier()
+mach = machine(model, Xtrain, ytrain)
+fit!(mach, verbosity=0)
+
+yhat = predict(mach, Xtest)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Visualization Libraries}
+\begin{itemize}
+    \item \textbf{Plots.jl}, \textbf{Makie.jl}, \textbf{StatsPlots.jl}
+\end{itemize}
+\begin{lstlisting}
+using Plots, StatsPlots
+
+x = 1:10; y = rand(10)
+plot(x, y, seriestype = :scatter,
+     title = "My Scatter Plot",
+     xlabel = "X-axis", ylabel = "Y-axis")
+
+histogram(randn(1000), bins=50, title="Normal Distribution Histogram")
+\end{lstlisting}
+\end{frame}
+
+\section{Julia-Specific IDEs \& Best Practices}
+
+\begin{frame}{IDEs for Julia Development}
+\begin{itemize}
+
+    \item \textbf{VS Code with Julia Extension}
+    \item \textbf{Jupyter Notebooks via IJulia.jl}
+    \item \textbf{Julia REPL}
+    \item \textit{Positron (my favorite)}
+\end{itemize}
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{positron.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Package Management: Julia vs Python vs R}
+\textbf{How do I install and manage packages?}
+
+\vspace{0.3cm}
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Feature} & \textbf{Julia} & \textbf{Python} & \textbf{R} \\
+\hline
+Built-in environment management & \texttt{Pkg} & \texttt{venv}, \texttt{virtualenv} & \texttt{renv}, \texttt{packrat} \\
+\hline
+Third-party tools & -- & \texttt{conda}, \texttt{pipenv}, \texttt{poetry} & \texttt{conda}, \texttt{checkpoint} \\
+\hline
+Dependency file & \texttt{Project.toml} & \texttt{requirements.txt}, \texttt{pyproject.toml} & \texttt{renv.lock} \\
+\hline
+Version pinning & \texttt{Manifest.toml} & \texttt{pip freeze}, \texttt{lock files} & \texttt{renv.lock} \\
+\hline
+Project isolation & \checkmark & \checkmark & \checkmark \\
+\hline
+Ease of use & High & Medium--High & Medium \\
+\hline
+\end{tabular}%
+}
+\caption{Comparison of environment and package management across Julia, Python, and R}
+\end{table}
+
+\end{frame}
+
+
+
+\begin{frame}{Best Practices: Writing Performant Julia Code}
+\begin{itemize}
+    \item Prefer functions over global scope.
+    \item Ensure type-stable functions.
+    \item Use \texttt{BenchmarkTools.jl} to profile performance.
+    \item Embrace multiple dispatch.
+\end{itemize}
+\end{frame}
+
+\section{Use Cases \& Why Julia Excels}
+
+\begin{frame}{Use Cases: Statistical \& ML Analyses}
+\begin{itemize}
+    \item MCMC, simulation, ML pipelines.
+    \item No need to rewrite in C++ for speed.
+    \item Optimization
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Use Cases: Plotting \& Data Manipulation}
+\begin{itemize}
+    \item High-fidelity plots with Makie.
+    \item Big-data manipulation with DataFrames.jl
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Use Cases: Delivering Analytical Products}
+\begin{itemize}
+    \item Web apps with Genie.jl, dashboards, REST APIs.
+    \item Compile to native executables.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why Julia?}
+\begin{itemize}
+    \item \textbf{Data Scientists:} Faster iteration, production-ready.
+    \item \textbf{Engineers:} Simulation, modeling.
+    \item \textbf{Mathematicians:}  \textit{optimization}, linear algebra.
+    \item \textbf{Computer Scientists:} Metaprogramming, compiler tools.
+\end{itemize}
+\end{frame}
+
+\section{Live Code Demonstration}
+
+\begin{frame}{Live Code Demonstration}
+\textbf{Live demonstration will show Julia in comparison to pyhton and R.}
+\end{frame}
+
+\section{Q\&A and Resources}
+
+\begin{frame}{Questions \& Discussion}
+    \centering
+    \Huge{Q\&A}
+\end{frame}
+
+\begin{frame}{Resources}
+\begin{itemize}
+    \item \href{https://julialang.org}{julialang.org}
+    \item \href{https://discourse.julialang.org}{Julia Discourse}
+    \item \href{https://juliahub.com/packages}{JuliaHub}
+    \item JuliaAcademy, RCall.jl, PyCall.jl
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Thank You!}
+    \centering
+    \Huge{Thank You!}
+    \vspace{1cm}
+    \Large{Questions? Comments?}
+    \vspace{0.5cm}
+    \normalsize
+    \href{mailto:nicholas.m.uhorchak.mil@army.mil}{nicholas.m.uhorchak.mil@army.mil}
+\end{frame}
+
+\end{document}
